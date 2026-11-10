@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Keke21</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-wrap">
+            <div class="logo">
+                <a href="">
+                    <img src="">
+                </a>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="">index</a></li>
+                   
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container site-content">
+        <div class="main-layout">
+            <!-- Zone dynamique où le contenu des autres pages s'injectera -->
+            <main class="main-content">
+                {% block content %}
+                {% endblock %}
+            </main>
+
+            <aside class="sidebar">
+                {% block aside %}
+                {% endblock %}
+            </aside>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="container footer-wrap">
+            <p>&copy; 2026 Keke21. Tous droits réservés.</p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Keke21</h1>
+    <p>Votre distributeur de piece auto</p>
+
+    <ul class="menu">
+        <li>
+            <a href="">
+                <img src="{{ url_for('static', filename='img/users.svg') }}">
+                <p>Utilisateurs</p>
+            </a>
+        </li>
+       
+    </ul>
+{% endblock %}
+{% block aside %}            
+    <h3>Derniers actus</h3>
+    <ul class="list-users">
+      
+    </ul>
+{% endblock %}
+   
