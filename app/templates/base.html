@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Keke21</title>
+    <title>RenoLaDèche </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
@@ -11,8 +11,8 @@
     <header class="site-header">
         <div class="container header-wrap">
             <div class="logo">
-                <a href="">
-                    <img src="">
+               <a href="{{ url_for('index') }}">
+                    <img src="{{ url_for('static', filename='img/logoReno.png') }}">
                 </a>
             </div>
             <nav class="main-nav">
