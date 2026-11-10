@@ -4,7 +4,7 @@ from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 import json
 
-# Lien exact de ton produit
+
 URL = "https://www.mister-auto.com/plaquette-de-frein-arriere-valeo-021-301007-p/"
 
 
@@ -47,7 +47,7 @@ def obtenir_donnees_mister_auto():
     driver = None
 
     try:
-        # Configuration de Google Chrome
+        
         options = Options()
         options.add_argument("--start-maximized")
 
@@ -56,27 +56,27 @@ def obtenir_donnees_mister_auto():
         driver = webdriver.Chrome(options=options)
         driver.set_page_load_timeout(30)
 
-        # Ouverture du produit Mister-Auto
+        
         driver.get(URL)
 
         print("Page ouverte :", driver.current_url)
 
-        # Attendre que la page soit visible
+        
         input(
             "Quand la page est chargée, "
             "appuie sur Entrée dans le terminal..."
         )
 
-        # Récupération du HTML
+        
         soup = BeautifulSoup(
             driver.page_source,
             "html.parser"
         )
 
-        # Vérification du titre
+        
         print("Titre de la page :", driver.title)
 
-        # Nom du produit
+        
         nom = "Plaquettes de frein arrière VALEO"
 
         titre = soup.select_one("h1")
@@ -84,10 +84,10 @@ def obtenir_donnees_mister_auto():
         if titre:
             nom = titre.get_text(" ", strip=True)
 
-        # Recherche du prix
+        
         prix = None
 
-        # Méthode 1 : balise itemprop
+        
         element_prix = soup.select_one(
             '[itemprop="price"]'
         )
@@ -98,7 +98,7 @@ def obtenir_donnees_mister_auto():
                 or element_prix.get_text(strip=True)
             )
 
-        # Méthode 2 : meta product:price
+        
         if prix is None:
             meta_prix = soup.select_one(
                 'meta[property="product:price:amount"]'
@@ -107,7 +107,7 @@ def obtenir_donnees_mister_auto():
             if meta_prix:
                 prix = meta_prix.get("content")
 
-        # Méthode 3 : JSON-LD
+        
         if prix is None:
             scripts = soup.select(
                 'script[type="application/ld+json"]'
@@ -127,7 +127,7 @@ def obtenir_donnees_mister_auto():
                 except (json.JSONDecodeError, TypeError):
                     continue
 
-        # Résultat
+        
         if prix is None:
             return {
                 "nom": nom,
