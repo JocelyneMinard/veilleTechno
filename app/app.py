@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 from flask import Flask, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
+import pandas
 
 
 path_projet = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -26,6 +27,20 @@ app = Flask(__name__)
 @app.route("/")
 def index():
    return render_template("index.html")
+
+@app.route('/view', methods=['GET'])
+def view_excel():
+    file = os.path.join(path_projet, "Book.xlsx")
+    try:
+        # Lire le fichier Excel directement depuis la mémoire avec Pandas
+        content_file = pandas.read_excel(file)
+        # Convertir le DataFrame en tableau HTML
+        data = content_file.to_html(classes ='table', border ="0", index=False)
+        print(data)
+        
+        return render_template("data.html", data = data)
+    except FileNotFoundError:
+            return f"Le fichier 'Book.xlsx' est introuvable dans le dossier {path_projet}", 404
 
 if __name__ == "__main__":
     app.run(debug=True)

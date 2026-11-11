@@ -140,3 +140,10 @@ h2{font-size:1.25rem}
 
 .alert-success{color:#118b35}
 .alert-danger{color:#8b1125}
+
+
+.table tr td{
+    border-top: 1px solid #808080 !important;
+    padding: 1rem;
+    margin: 0
+}
