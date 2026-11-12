@@ -1,160 +1,61 @@
+import re
+
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from bs4 import BeautifulSoup
-import json
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from openpyxl import load_workbook
+import sys
+import os
 
 
-URL = "https://www.oscaro.com/jeu-de-4-plaquettes-de-frein-valeo-301007-6042068-402-p#/?vid=11408"
+def take_oscaro_data():
 
+    path_projet = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 
-def chercher_prix_json(data):
-    """Recherche un prix dans les données JSON-LD."""
-    if isinstance(data, list):
-        for element in data:
-            prix = chercher_prix_json(element)
-            if prix is not None:
-                return prix
+    if path_projet not in sys.path:
+        sys.path.insert(0, path_projet)
 
-    elif isinstance(data, dict):
-        offres = data.get("offers")
+    produits = [
+        ("Filtre à huile Purflux", "https://www.oscaro.com/filtre-a-huile-purflux-ls280a-1213708-7-p#/?vid=11408", 2),
+        ("Amortisseur TRW", "https://www.oscaro.com/jeu-de-2-amortisseurs-trw-jht264t-1857387-3539-p#/?vid=11408", 3),
+        ("Plaquettes Valeo", "https://www.oscaro.com/jeu-de-4-plaquettes-de-frein-valeo-301007-6042068-402-p#/?vid=11408 ", 4)
+    ]
 
-        if isinstance(offres, dict):
-            if offres.get("price") is not None:
-                return offres["price"]
+    classeur = load_workbook(os.path.join(path_projet, "Book.xlsx"))
+    feuille = classeur["Veille concurrentielle"]
 
-        elif isinstance(offres, list):
-            for offre in offres:
-                prix = chercher_prix_json(
-                    {"offers": offre}
-                )
-                if prix is not None:
-                    return prix
-
-        for valeur in data.values():
-            prix = chercher_prix_json(valeur)
-            if prix is not None:
-                return prix
-
-    return None
-
-
-def obtenir_donnees_oscaro():
-    driver = None
+    driver = webdriver.Chrome()
 
     try:
-        
-        options = Options()
-        options.add_argument("--start-maximized")
+        for nom, url, ligne in produits:
+            try:
+                driver.get(url)
+                WebDriverWait(driver, 10).until(
+                    EC.text_to_be_present_in_element((By.CSS_SELECTOR, ".price p"), "€")
+                )
+                element = driver.find_element(By.CSS_SELECTOR, ".price p")
 
-        print("Ouverture de Google Chrome...")
 
-        driver = webdriver.Chrome(options=options)
-        driver.set_page_load_timeout(30)
+                prix = element.get_attribute("textContent")
+               
+                prix = re.search(r"(\d+[.,]\d+)", prix)
+                prix = float(prix.group(1).replace(",", "."))
+                print(prix)
+                feuille.cell(row=ligne, column=3).value = prix
+                
 
-        
-        driver.get(URL)
-
-        print("Page ouverte :", driver.current_url)
-
-        
-        input(
-            "Quand la page est chargée, "
-            "appuie sur Entrée dans le terminal..."
-        )
-
-        
-        soup = BeautifulSoup(
-            driver.page_source,
-            "html.parser"
-        )
-
-        
-        print("Titre de la page :", driver.title)
-
-        
-        nom = "Plaquettes de frein arrière VALEO"
-
-        titre = soup.select_one("h1")
-
-        if titre:
-            nom = titre.get_text(" ", strip=True)
-
-        
-        prix = None
-
-        
-        element_prix = soup.select_one(
-            '[itemprop="price"]'
-        )
-
-        if element_prix:
-            prix = (
-                element_prix.get("content")
-                or element_prix.get_text(strip=True)
-            )
-
-        
-        if prix is None:
-            meta_prix = soup.select_one(
-                'meta[property="product:price:amount"]'
-            )
-
-            if meta_prix:
-                prix = meta_prix.get("content")
-
-        
-        if prix is None:
-            scripts = soup.select(
-                'script[type="application/ld+json"]'
-            )
-
-            for script in scripts:
-                try:
-                    data = json.loads(
-                        script.string or script.get_text()
-                    )
-
-                    prix = chercher_prix_json(data)
-
-                    if prix is not None:
-                        break
-
-                except (json.JSONDecodeError, TypeError):
-                    continue
-
-        
-        if prix is None:
-            return {
-                "nom": nom,
-                "prix": None,
-                "url": URL,
-                "statut": "Prix introuvable"
-            }
-
-        return {
-            "nom": nom,
-            "prix": str(prix),
-            "url": URL,
-            "statut": "Succès"
-        }
-
-    except Exception as e:
-        return {
-            "erreur": str(e),
-            "statut": "Échec"
-        }
+                print(nom, ":", prix, "€")
+               
+            except Exception:
+                print(nom, ": prix introuvable, ancien prix conservé")
 
     finally:
-        if driver:
-            driver.quit()
+        driver.quit()
+
+    classeur.save(os.path.join(path_projet, "Book.xlsx"))
+    print("Fichier Excel mis à jour !")
 
 
 if __name__ == "__main__":
-    resultat = obtenir_donnees_oscaro()
-
-    print("\n========== RÉSULTAT ==========")
-    print(json.dumps(
-        resultat,
-        indent=4,
-        ensure_ascii=False
-    ))
+    take_oscaro_data()
