@@ -9,7 +9,7 @@ path_projet = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if path_projet not in sys.path:
     sys.path.insert(0, path_projet)
 
-from services import take_mister_auto_data, take_oscaro_data
+from services import take_mister_auto_data, take_oscaro_data, take_auto_doc_data
 
 app = Flask(__name__)
 
@@ -24,6 +24,7 @@ def index_post():
     try:
         take_mister_auto_data()
         take_oscaro_data()
+        take_auto_doc_data()
         flash(
             "Recuperation réussie ! ",
             "success",
