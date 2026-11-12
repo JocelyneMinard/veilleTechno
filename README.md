@@ -15,3 +15,13 @@ Cette formule veut dire que la fonction SI associée à OU permet de vérifié s
 la formule calcule la différence entre notre prix et celui du concurrent le moins chère. Sinon, la cellule restera vide.
 
 Les prix récupérés par nos codes fait en python sont ensuite enregistrés automatiquement dans le fichier Excel.
+
+## Flask
+Nous sommes passés par flak pour avoir un site afin de lancer les scripts de scraping et afficher le tableau Excel. Ce mini-POC teste seulement la faisabilité du scraping sur les sites concurrents
+La technologie pour faire cela est Selenium. Il utilise une session Chrome afin d'ouvrir les URL pour récupérer les prix
+Le POC n'est qu'une première étape de scraping car pour le moment cela est très lourd pour seulement 3 produits, des optimisations sont à réaliser
+
+## Stockage
+Le POC se base sur un fichier Excel, pour plus de robustesse il faudra une base de données SQLite ou PostgreSQL
+
+
