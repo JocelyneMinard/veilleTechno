@@ -32,11 +32,12 @@ def take_auto_doc_data():
             try:
                 driver.get(url)
 
-                element = driver.find_element(By.CSS_SELECTOR, ".large-price--std")
+                element = driver.find_element(By.CSS_SELECTOR, ".product-card__price-wrap")
 
                 prix = element.get_attribute("textContent")
-                prix = float(prix.replace("€", "").replace("\xa0", "").replace(",", ".").strip())
-
+                print(prix)
+                prix = prix.replace("€", "")
+                print(f"prix apres {prix}")
                 feuille.cell(row=ligne, column=4).value = prix
 
                 print(nom, ":", prix, "€")
@@ -49,3 +50,8 @@ def take_auto_doc_data():
 
     classeur.save(os.path.join(path_projet, "Book.xlsx"))
     print("Fichier Excel mis à jour !")
+
+
+
+if __name__ == "__main__":
+    take_auto_doc_data()
