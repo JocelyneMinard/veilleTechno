@@ -1,12 +1,13 @@
-import re
-
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from seleniumbase import Driver
 from openpyxl import load_workbook
-import sys
 import os
+import random
+import re
+import sys
+import time
 
 def take_auto_doc_data():
 
@@ -24,23 +25,30 @@ def take_auto_doc_data():
 
     classeur = load_workbook(os.path.join(path_projet, "Book.xlsx"))
     feuille = classeur["Veille concurrentielle"]
-
-    driver = webdriver.Chrome()
+    driver = Driver(uc=True)
 
     try:
         for nom, url, ligne in produits:
             try:
-                driver.get(url)
+                # Ouvre l'URL en déconnectant brièvement le pilote pour passer Cloudflare
+                driver.uc_open_with_reconnect(url.strip(), reconnect_time=5)
 
+                WebDriverWait(driver, 30).until(
+                    EC.text_to_be_present_in_element((By.CSS_SELECTOR, ".product-card__price-wrap"), "€")
+                )
                 element = driver.find_element(By.CSS_SELECTOR, ".product-card__price-wrap")
 
-                prix = element.get_attribute("textContent")
-                print(prix)
-                prix = prix.replace("€", "")
-                print(f"prix apres {prix}")
-                feuille.cell(row=ligne, column=4).value = prix
+                texte_prix = element.get_attribute("textContent")
+                match = re.search(r"(\d+\s*[.,]\s*\d+)", texte_prix)
+              
+                if match:
+                    prix_propre = re.sub(r"\s+", "", match.group(1)).replace(",", ".")
+                    prix = float(prix_propre)
+                    feuille.cell(row=ligne, column=4).value = prix
+                    print(f"{nom} : {prix} €")
 
-                print(nom, ":", prix, "€")
+                # Pause naturelle entre deux fiches produits
+                time.sleep(random.uniform(3, 6))
 
             except Exception:
                 print(nom, ": prix introuvable, ancien prix conservé")
