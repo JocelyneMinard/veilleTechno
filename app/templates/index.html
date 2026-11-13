@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>RenoLaDèche </h1>
+    <p>Votre distributeur de piece auto quand c'est la hesse</p>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert-flash alert-{{ category }}">
+                    {{ message }}
+                    <span onclick="this.parentElement.style.display='none';" style="position: absolute; right: 15px; top: 12px; cursor: pointer; font-size: 20px; line-height: 20px;">&times;</span>
+                </div>
+
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <form action="{{ url_for('index_post') }}" method="POST">
+        <button type="submit" class="btn">Recuperer les infos</button>
+    </form>
+    <img src="{{ url_for('static', filename='img/illustration.jpg') }}">
+
+{% endblock %}
+{% block aside %}            
+    <h3>Derniers actus</h3>
+    <ul class="list-users">
+      
+    </ul>
+{% endblock %}
+   
